@@ -10,6 +10,7 @@ namespace FileEncryption
     {
         private string currentFilePath;
         private string currentKey;
+        private const int BufferSize = 8192;
 
         public Form1()
         {
@@ -62,8 +63,7 @@ namespace FileEncryption
 
         private void EncryptDecryptFile(string filePath, string key)
         {
-            private const int BufferSize = 8192;
-        byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
             string tempFile = Path.GetTempFileName();
 
             using (FileStream inputStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
@@ -74,16 +74,20 @@ namespace FileEncryption
 
                 while ((bytesRead = inputStream.Read(buffer, 0, buffer.Length)) > 0)
                 {
-                    for (int i = 0; i < bytesRead; i++)
-                    {
-                        buffer[i] ^= keyBytes[i % keyBytes.Length];
-                    }
+                    TransformBytes(buffer, bytesRead, keyBytes);
                     tempStream.Write(buffer, 0, bytesRead);
                 }
             }
 
             File.Copy(tempFile, filePath, overwrite: true);
             File.Delete(tempFile);
+        }
+        private void TransformBytes(byte[] buffer, int count, byte[] keyBytes)
+        {
+            for (int i = 0; i < count; i++)
+            {
+                buffer[i] ^= keyBytes[i % keyBytes.Length];
+            }
         }
     }
 }
