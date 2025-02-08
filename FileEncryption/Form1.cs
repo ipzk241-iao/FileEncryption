@@ -62,7 +62,8 @@ namespace FileEncryption
 
         private void EncryptDecryptFile(string filePath, string key)
         {
-            byte[] keyBytes = Encoding.UTF8.GetBytes(key);
+            private const int BufferSize = 8192;
+        byte[] keyBytes = Encoding.UTF8.GetBytes(key);
             string tempFile = Path.GetTempFileName();
 
             using (FileStream inputStream = new FileStream(filePath, FileMode.Open, FileAccess.Read))
